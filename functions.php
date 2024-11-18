@@ -1,11 +1,9 @@
 <?php
-// functions.php
-
 // Database configuration
-define('DB_HOST', 'localhost'); // Database host
-define('DB_NAME', 'dct-ccs-finals'); // Database name
-define('DB_USER', 'root'); // Database username
-define('DB_PASS', ''); // Database password
+define('DB_HOST', 'localhost');
+define('DB_NAME', 'dct-ccs-finals');
+define('DB_USER', 'root');
+define('DB_PASS', '');
 
 // Function to create a database connection
 function dbConnect()
@@ -16,7 +14,7 @@ function dbConnect()
         return $pdo;
     } catch (PDOException $e) {
         echo "Connection failed: " . $e->getMessage();
-        return null;
+        exit;
     }
 }
 
@@ -25,11 +23,17 @@ function loginUser($email, $password)
 {
     $db = dbConnect();
     if ($db) {
-        $query = $db->prepare("SELECT * FROM users WHERE email = :email AND password = :password");
+        // Fetch the user by email
+        $query = $db->prepare("SELECT * FROM users WHERE email = :email");
         $query->bindParam(':email', $email);
-        $query->bindParam(':password', $password);
         $query->execute();
-        return $query->fetch(PDO::FETCH_ASSOC);
+        $user = $query->fetch(PDO::FETCH_ASSOC);
+
+        // Check if user exists and verify MD5 password (for your current setup)
+        if ($user && md5($password) === $user['password']) {
+            // User authenticated successfully
+            return $user;
+        }
     }
     return null;
 }
