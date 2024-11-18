@@ -20,8 +20,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
     if ($user) {
         $message = "Login successful! Welcome, " . htmlspecialchars($user['email']);
         // Redirect to a dashboard or another page (uncomment below)
-        // header('Location: dashboard.php');
-        // exit;
+        header('Location: /admin/dashboard.php');
+        exit;
     } else {
         $message = "Invalid email or password.";
     }
