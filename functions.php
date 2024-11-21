@@ -748,9 +748,17 @@ function getRequestData($parameter) {
 }
 
 // Database
-function isFormSubmitted() {
-    return $_SERVER['REQUEST_METHOD'] == "POST";
+function isFormSubmitted($field = null)
+{
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        if ($field) {
+            return isset($_POST[$field]) ? htmlspecialchars(trim($_POST[$field])) : null;
+        }
+        return true;
+    }
+    return false;
 }
+
 
 // User Authentication
 
@@ -765,5 +773,8 @@ function logOutUser($redirectPage) {
     header("Location: $redirectPage");
     exit;
 }
+//isFormSubmitted
+//fetchAllStudents
 
 ?>
+

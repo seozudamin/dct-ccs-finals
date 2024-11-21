@@ -1,118 +1,90 @@
 <?php
+include '../../functions.php'; // Include the functions
 include '../partials/header.php';
-include '../partials/side-bar.php';// If header.php is in the partials folder at the same level as student// Adjust according to your directory structure
+
+$logoutPage = '../logout.php';
+$dashboardPage = '../dashboard.php';
+include '../partials/side-bar.php';
 ?>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
-<div class="col-md-9 ms-sm-auto col-lg-10 px-md-4 pt-5">
-    <div class="row">
-        <div class="col-md-12">
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item">
-                        <form method="post" action="http://dct-ccs-finals.test/admin/dashboard.php">
-                            <button type="submit" class="btn btn-link"
-                                style="border: none; background: none; padding: 0; text-decoration: underline; cursor: pointer;">Dashboard</button>
-                        </form>
-                    </li>
-                    <li class="breadcrumb-item active" aria-current="page">Register Student</li>
-                </ol>
-            </nav>
-            <h2>Register a New Student</h2>
+<div class="col-md-9 col-lg-10">
+<h3 class="text-left mb-5 mt-5">Register a New Student</h3>
+<nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="../dashboard.php">Dashboard</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Register Student</li>
+        </ol>
+    </nav>
 
-            <!-- Display Errors -->
-            <div class="alert alert-danger" style="display:none;">
-                <ul>
-                    <!-- Error messages will go here if needed -->
-                    <li>Example error message</li>
-                </ul>
+    <!----Form Submit -->
+    <?php 
+        if(isFormSubmitted()){
+            $student_id = isFormSubmitted("student_id");
+            $first_name = isFormSubmitted("first_name");
+            $last_name = isFormSubmitted("last_name");
+            addNewStudent($student_id, $first_name, $last_name);
+        }
+    ?>
+
+    <!-- Register Student Form -->
+    <div class="card p-4 mb-5">
+        <form method="POST">
+            <div class="mb-3">
+                <label for="student_id" class="form-label">Student ID</label>
+                <input type="text" class="form-control" id="student_id" name="student_id">
             </div>
-
-            <!-- Form for Registering New Student -->
-            <div class="card mb-4">
-                <div class="card-body">
-                    <form method="post" action="">
-                        <div class="mb-3">
-                            <label for="studentId" class="form-label">Student ID</label>
-                            <input type="text" class="form-control" id="studentId" name="student_id"
-                                placeholder="Enter Student ID" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="firstName" class="form-label">First Name</label>
-                            <input type="text" class="form-control" id="firstName" name="first_name"
-                                placeholder="Enter First Name" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="lastName" class="form-label">Last Name</label>
-                            <input type="text" class="form-control" id="lastName" name="last_name" placeholder="Enter Last Name"
-                                required>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Register Student</button>
-                    </form>
-                </div>
+            <div class="mb-3">
+                <label for="first_name" class="form-label">First Name</label>
+                <input type="text" class="form-control" id="first_name" name="first_name">
             </div>
+            <div class="mb-3">
+                <label for="last_name" class="form-label">Last Name</label>
+                <input type="text" class="form-control" id="last_name" name="last_name">
+            </div>
+            <button type="submit" class="btn btn-primary btn-sm w-100">Add Student</button>
+        </form>
+    </div>
 
-            <!-- Student List Table -->
-            <h3>Student List</h3>
-            <table class="table table-striped">
-                <thead>
+    <!-- Student List Table -->
+    <div class="card p-4">
+        <h3 class="card-title text-center">Student List</h3>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Student ID</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Options</th>
+                </tr>
+            </thead>
+            <tbody>
+            <?php $students = fetchAllStudents();  if (!empty($students)): ?>
+                    <?php foreach ($students as $student): ?>
+                        <tr>
+                            <td><?= htmlspecialchars($student['student_id']) ?></td>
+                            <td><?= htmlspecialchars($student['first_name']) ?></td>
+                            <td><?= htmlspecialchars($student['last_name']) ?></td>
+                            <td>
+                                <!-- Edit Button (Green) -->
+                                <a href="edit.php?student_id=<?= urlencode($student['student_id']) ?>" class="btn btn-primary btn-sm">Edit</a>
+                                <!-- Delete Button (Red) -->
+                                <a href="delete.php?student_id=<?= urlencode($student['student_id']) ?>" class="btn btn-danger btn-sm">Delete</a> 
+                                <!-- Delete Button (Red) -->
+                                <a href="attach-subject.php?student_id=<?= urlencode($student['student_id']) ?>" class="btn btn-warning btn-sm">Attach Subject</a>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                <?php else: ?>
                     <tr>
-                        <th>Student ID</th>
-                        <th>First Name</th>
-                        <th>Last Name</th>
-                        <th>Action</th>
+                        <td colspan="4" class="text-center">No students found.</td>
                     </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>12345</td>
-                        <td>John</td>
-                        <td>Doe</td>
-                        <td>
-                            <!-- Edit Button -->
-                            <form method="post" action="edit.php" style="display:inline;">
-                                <input type="hidden" name="student_id" value="12345">
-                                <button type="submit" style="background-color: #05ADADFF; color: white; border: none;"
-                                    class="btn btn-sm">Edit</button>
-                            </form>
-                            <!-- Delete Button -->
-                            <form method="post" action="delete.php" style="display:inline;">
-                                <input type="hidden" name="student_id" value="12345">
-                                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-                            </form>
-                            <!-- Attach Button -->
-                            <form method="" action="" style="display:inline;">
-                                <button type="submit" style="background-color: #E6E326FF; color: black; border: none;"
-                                    class="btn btn-sm">Attach Subject</button>
-                            </form>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>67890</td>
-                        <td>Jane</td>
-                        <td>Smith</td>
-                        <td>
-                            <!-- Edit Button -->
-                            <form method="post" action="edit.php" style="display:inline;">
-                                <button type="submit" style="background-color: #05ADADFF; color: white; border: none;"
-                                    class="btn btn-sm">Edit</button>
-                            </form>
-                            <!-- Delete Button -->
-                            <form method="post" action="delete.php" style="display:inline;">
-                                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-                            </form>
-                            <!-- Attach Button -->
-                            <form method="" action="" style="display:inline;">
-                                <button type="submit" style="background-color: #E6E326FF; color: black; border: none;"
-                                    class="btn btn-sm">Attach Subject</button>
-                            </form>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan="4" class="text-center">No students registered yet.</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+                <?php endif; ?>
+            </tbody>
+        </table>
     </div>
 </div>
+
+<!--Logout-->
+<?php
+include '../partials/footer.php';
+?>
