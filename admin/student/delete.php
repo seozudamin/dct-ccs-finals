@@ -1,35 +1,58 @@
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">
-    <div class="container mt-5">
-        <!-- Breadcrumb Navigation -->
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="#">Dashboard</a></li>
-                <li class="breadcrumb-item"><a href="#">Register Student</a></li>
-                <li class="breadcrumb-item active" aria-current="page">Delete Student</li>
-            </ol>
-        </nav>
+<?php
+include '../../functions.php'; // Include the functions
+include '../partials/header.php';
 
-        <!-- Delete Confirmation Card -->
-        <div class="card">
-            <div class="card-header">
-                <h4>Delete a Student</h4>
-            </div>
-            <div class="card-body">
-                <p>Are you sure you want to delete the following student record?</p>
-                <ul>
-                    <li><strong>Student ID:</strong> [Student ID]</li>
-                    <li><strong>First Name:</strong> [First Name]</li>
-                    <li><strong>Last Name:</strong> [Last Name]</li>
-                </ul>
-                <!-- Action Buttons -->
-                <form method="POST">
-                    <input type="hidden" name="student_id" value="[Student ID]">
-                    <div class="d-flex gap-2">
-                        <a href="register.php" class="btn btn-secondary">Cancel</a>
-                        <button type="submit" name="confirm_delete" class="btn btn-primary">Delete Student Record</button>
-                    </div>
-                </form>
-            </div>
+$logoutPage = '../logout.php';
+$dashboardPage = '../dashboard.php';
+$studentPage = '../student/register.php';
+$subjectPage = './subject/add.php';
+include '../partials/side-bar.php';
+
+$student_data = getStudentById($_GET['student_id']);
+
+if (isFormSubmitted()) {
+    deleteStudentRecord($student_data['student_id'], 'register.php');
+}
+?>
+
+<div class="col-md-9 col-lg-10">
+
+    <h3 class="text-left mb-5 mt-5">Delete a Student</h3>
+
+    <!-- Breadcrumb Navigation -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="../dashboard.php">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="register.php">Register Student</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Delete Student</li>
+        </ol>
+    </nav>
+
+    <!-- Delete Confirmation Card -->
+    <div class="card">
+        <div class="card-header">
+            <h4>Delete a Student</h4>
+        </div>
+        <div class="card-body">
+            <p>Are you sure you want to delete the following student record?</p>
+            <ul>
+                <li><strong>Student ID:</strong> <?= htmlspecialchars($student_data['student_id']) ?></li>
+                <li><strong>First Name:</strong> <?= htmlspecialchars($student_data['first_name']) ?></li>
+                <li><strong>Last Name:</strong> <?= htmlspecialchars($student_data['last_name']) ?></li>
+            </ul>
+            <!-- Action Buttons -->
+            <form method="POST">
+                <input type="hidden" name="student_id" value="<?= htmlspecialchars($student_data['student_id']) ?>">
+                <div class="d-flex gap-2">
+                    <a href="register.php" class="btn btn-secondary">Cancel</a>
+                    <button type="submit" name="confirm_delete" class="btn btn-primary">Delete Student Record</button>
+                </div>
+            </form>
         </div>
     </div>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous></script>
+
+</div>
+
+<?php
+include '../partials/footer.php';
+?>
