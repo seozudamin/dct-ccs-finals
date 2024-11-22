@@ -13,8 +13,8 @@ $link = "http://dct-ccs-finals.test/admin/dashboard.php"; // Update this link as
 
 <?php
 if (isFormSubmitted()) {
-    $subject_code = postData("student_id"); // This should match the input name in your form
-    $subject_name = postData("first_name"); // This should match the input name in your form
+    $subject_code = postData("subject_code"); // This should match the input name in your form
+    $subject_name = postData("subject_name"); // This should match the input name in your form
 
     // Debugging: Check if the data is being received
     if ($subject_code && $subject_name) {
@@ -72,7 +72,6 @@ $subjects = fetchCourses();
                     <tr>
                         <th>Subject Code</th>
                         <th>Subject Name</th>
-                        <th>Option</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -88,7 +87,7 @@ $subjects = fetchCourses();
                                         <button type="submit" style="background-color: #05ADADFF; color: white; border: none;" class="btn btn-sm">Edit</button>
                                     </form>
                                     <!-- Delete Button -->
-                                    <form method="post" action="delete.php" style="display:inline;">
+                                    <form method="post" action="./delete.php" style="display:inline;">
                                         <input type="hidden" name="student_id" value="<?= htmlspecialchars($subject['subject_code']) ?>">
                                         <button type="submit" class="btn btn-danger btn-sm">Delete</button>
                                     </form>
