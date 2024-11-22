@@ -165,38 +165,38 @@ function calculatePassedAndFailedStudents()
 }
 
 //
-function addCourse($course_code, $course_name) {
-    $validateCourseData = validateCourseData($course_code, $course_name);
+function addSubject($subject_code, $subject_name) {
+    // Get database connection
+    $dbConn = dbConnect(); // Assuming dbConnect() is already defined to connect to your database
 
-    $checkDuplicateCourse = checkDuplicateCourseData($course_code, $course_name);
-
-    if(count($validateCourseData) > 0 ){
+    // Validate input
+    $validateCourseData = validateSubjectData($subject_code, $subject_name);
+    if (count($validateCourseData) > 0) {
         echo displayErrors($validateCourseData);
         return;
     }
 
-    if(count($checkDuplicateCourse) == 1 ){
+    // Check for duplicate subject
+    $checkDuplicateCourse = checkDuplicateCourseData($subject_code, $subject_name);
+    if (count($checkDuplicateCourse) > 0) {
         echo displayErrors($checkDuplicateCourse);
         return;
     }
 
-    // Get database connection
-    $dbConn = dbConnect();
-
     try {
-        // Prepare SQL query to insert course into the database
-        $query = "INSERT INTO courses (course_code, course_name) VALUES (:course_code, :course_name)";
+        // Prepare SQL query to insert subject into the database
+        $query = "INSERT INTO subjects (subject_code, subject_name) VALUES (:subject_code, :subject_name)";
         $stmt = $dbConn->prepare($query);
 
         // Bind parameters to the SQL query
-        $stmt->bindParam(':course_code', $course_code);
-        $stmt->bindParam(':course_name', $course_name);
+        $stmt->bindParam(':subject_code', $subject_code);
+        $stmt->bindParam(':subject_name', $subject_name);
 
         // Execute the query
         if ($stmt->execute()) {
-            return true; // Course successfully added
+        return true;
         } else {
-            return "Failed to add course."; // Query execution failed
+            return "Failed to add subject.";
         }
     } catch (PDOException $e) {
         // Return error message if the query fails
@@ -204,16 +204,16 @@ function addCourse($course_code, $course_name) {
     }
 }
 
-function validateCourseData($course_code, $course_name) {
+function validateSubjectData($subject_code, $subject_name) {
     $errors = [];
 
     // Check if course_code is empty
-    if (empty($course_code)) {
+    if (empty($subject_code)) {
         $errors[] = "Course code is required.";
     }
 
     // Check if course_name is empty
-    if (empty($course_name)) {
+    if (empty($subject_name)) {
         $errors[] = "Course name is required.";
     }
 
@@ -221,17 +221,17 @@ function validateCourseData($course_code, $course_name) {
 }
 
 // Function to check if the course already exists in the database (duplicate check)
-function checkDuplicateCourseData($course_code, $course_name) {
+function checkDuplicateCourseData($subject_code, $subject_name) {
     // Get database connection
     $dbConn = dbConnect();
 
     // Query to check if the course_code already exists in the database
-    $query = "SELECT * FROM courses WHERE course_code = :course_code OR course_name = :course_name";
+    $query = "SELECT * FROM subjects WHERE subject_code = :subject_code OR subject_name = :subject_name";
     $stmt = $dbConn->prepare($query);
 
     // Bind parameters
-    $stmt->bindParam(':course_code', $course_code);
-    $stmt->bindParam(':course_name', $course_name);
+    $stmt->bindParam(':subject_code', $subject_code);
+    $stmt->bindParam(':subject_name', $subject_name);
 
     // Execute the query
     $stmt->execute();
@@ -248,16 +248,16 @@ function checkDuplicateCourseData($course_code, $course_name) {
 }
 
 // Function to check if the course already exists in the database for editing (duplicate check)
-function checkDuplicateCourseForEdit($course_name) {
+function checkDuplicateCourseForEdit($subject_name) {
     // Get database connection
     $dbConn = dbConnect();
 
     // Query to check if the course_name already exists in the database
-    $query = "SELECT * FROM courses WHERE course_name = :course_name";
+    $query = "SELECT * FROM subjects WHERE subject_name = :subject_name";
     $stmt = $dbConn->prepare($query);
 
     // Bind parameters
-    $stmt->bindParam(':course_name', $course_name);
+    $stmt->bindParam(':subject_name', $subject_name);
 
     // Execute the query
     $stmt->execute();
@@ -279,17 +279,17 @@ function fetchCourses() {
 
     try {
         // Prepare SQL query to fetch all courses
-        $query = "SELECT * FROM courses";
+        $query = "SELECT * FROM subjects";
         $stmt = $dbConn->prepare($query);
 
         // Execute the query
         $stmt->execute();
 
         // Fetch all courses as an associative array
-        $courses = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $subjects = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         // Return the list of courses
-        return $courses;
+        return $subjects;
     } catch (PDOException $e) {
         // Return an empty array in case of error
         return [];
@@ -321,21 +321,21 @@ function displayErrors($errors) {
 
 //Get Course 
 
-function getCourseByCode($course_code) {
+function getCourseByCode($subject_code) {
     $dbConn = dbConnect();
-    $query = "SELECT * FROM courses WHERE course_code = :course_code";
+    $query = "SELECT * FROM subjects WHERE subject_name = :subject_course";
     $stmt = $dbConn->prepare($query);
-    $stmt->execute([':course_code' => $course_code]);
+    $stmt->execute([':course_code' => $subject_code]);
     return $stmt->fetch(PDO::FETCH_ASSOC);
 }
 
 
 //Update Course
 
-function updateCourse($course_code, $course_name, $redirectPage) {
-    $validateCourseData = validateCourseData($course_code, $course_name);
+function updateCourse($subject_code, $subject_name, $redirectPage) {
+    $validateCourseData = validateSubjectData($subject_code, $subject_name);
 
-    $checkDuplicateCourse = checkDuplicateCourseForEdit($course_name);
+    $checkDuplicateCourse = checkDuplicateCourseForEdit($subject_name);
 
     if(count($validateCourseData) > 0 ){
         echo displayErrors($validateCourseData);
@@ -352,12 +352,12 @@ function updateCourse($course_code, $course_name, $redirectPage) {
         $dbConn = dbConnect();
 
         // Prepare the SQL query for updating the course
-        $query = "UPDATE courses SET course_name = :course_name WHERE course_code = :course_code";
+        $query = "UPDATE subjects SET subject_name = :subject_name WHERE subject_code = :subject_code";
         $stmt = $dbConn->prepare($query);
 
         // Bind the parameters
-        $stmt->bindParam(':course_name', $course_name, PDO::PARAM_STR);
-        $stmt->bindParam(':course_code', $course_code, PDO::PARAM_STR);
+        $stmt->bindParam(':subject_name', $subject_name, PDO::PARAM_STR);
+        $stmt->bindParam(':subject_code', $subject_code, PDO::PARAM_STR);
 
         // Execute the query
         if ($stmt->execute()) {
@@ -372,23 +372,23 @@ function updateCourse($course_code, $course_name, $redirectPage) {
 
 //Delete Course
 
-function deleteCourse($course_code, $redirectPage) {
+function deleteCourse($subject_code, $redirectPage) {
     try {
         // Get the database connection
         $dbConn = dbConnect();
 
         // Prepare the SQL query to delete the course
-        $query = "DELETE FROM courses WHERE course_code = :course_code";
+        $query = "DELETE FROM subjects WHERE subject_code = :subject_code";
         $stmt = $dbConn->prepare($query);
 
         // Bind the parameter
-        $stmt->bindParam(':course_code', $course_code, PDO::PARAM_STR);
+        $stmt->bindParam(':subject_code', $subject_code, PDO::PARAM_STR);
 
         // Execute the query
         if ($stmt->execute()) {
             echo "<script>window.location.href = '$redirectPage';</script>";
         } else {
-            return "Failed to delete the course with code $course_code.";
+            return "Failed to delete the course with code $subject_code.";
         }
     } catch (PDOException $e) {
         return "Error: " . $e->getMessage();
@@ -757,6 +757,10 @@ function isFormSubmitted($field = null)
         return true;
     }
     return false;
+}
+//post data
+function postData($key){
+    return $_POST["$key"];
 }
 
 
